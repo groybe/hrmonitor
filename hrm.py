@@ -13,7 +13,7 @@ import datetime
 # Mac Adress of heart rate device.
 hrm = "a0:9e:1a:b2:15:7e"
 target = "120"
-
+maxhr = 1
 params = ""
 
 try:
@@ -27,13 +27,16 @@ try:
                 btle.DefaultDelegate.__init__(self)
 
             def handleNotification(self, cHandle, data):
+                global maxhr
                 #print(cHandle)
                 #print(data)
 
                 heartrate = int.from_bytes(data, byteorder='big')
+                if maxhr < heartrate:
+                    maxhr = heartrate
                 print(chr(27) + "[2J") # clear screen using escape sequences
                 print(chr(27) + "[H")  # return to home using escape sequences
-                print("Heart Rate:", heartrate,"   Target:",target)
+                print("Heart Rate:", heartrate,"   Target:",target,"   Max:",maxhr)
 
         p = btle.Peripheral(hrm)
         p.withDelegate(MyDelegate(params))
